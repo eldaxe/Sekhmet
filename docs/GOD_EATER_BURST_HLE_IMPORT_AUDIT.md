@@ -14,7 +14,7 @@
 | Metric | Count |
 |---|---:|
 | EBOOT imports | 320 |
-| Unique (library, NID) pairs | [object Set] |
+| Unique (library, NID) pairs | 320 |
 | Names resolved | 316 |
 | Names unresolved | 4 |
 | Matching registrations | 277 |
