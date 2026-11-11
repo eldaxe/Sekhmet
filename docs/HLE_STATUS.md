@@ -2,7 +2,7 @@
 
 Target: US PSP release `ULUS10563`, `APP_VER 01.00`.
 
-The decrypted EBOOT import scan identified 320 function imports across 32 library records. This document is the tracking ledger; an import is not considered supported merely because a library name exists in PortableKit.
+The previous EBOOT audit summary reports 320 function imports across 32 library records. The original NID-by-NID CSV is not currently available in the Sekhmet repository, so the exact 320-entry comparison remains pending. This document is a tracking ledger; an import is not considered supported merely because a library name exists in PortableKit.
 
 ## Import inventory from EBOOT
 
@@ -49,4 +49,4 @@ The decrypted EBOOT import scan identified 320 function imports across 32 librar
 - PSP load base selected for initial profile: `0x08804000`
 - Import inventory: 320 function imports in 32 library records.
 
-The complete NID-by-NID list still needs to be added from the original ELF import audit. Counts above are a starting inventory, not a claim that the functions are implemented.
+The complete NID-by-NID list must be regenerated from the decrypted ULUS10563 EBOOT and committed as a plain-text audit artifact (no executable bytes). Counts above are a starting inventory, not a claim that the functions are implemented.
