@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`.
 PortableKit branch: `god-eater-burst`.
-PortableKit commit: `57b7fb13eb5712518651100d0f679cd2da56c48d`.
+PortableKit commit: `796c1e0d3b733eda20fbdc09811ece3f065dae58`.
 
 ## Current static import coverage
 
@@ -43,7 +43,7 @@ Added fixed-size, size-bounded status output for:
 - `sceKernelReferCallbackStatus`
 - `sceKernelReferVTimerStatus`
 
-The runtime now retains initial semaphore/mutex counts so those status structures can report them. Mailbox packet links are still host-side; `packetListHead` is written as zero and is not a complete PSP guest linked-list emulation.
+The runtime now retains initial semaphore/mutex counts so those status structures can report them. The lightweight-mutex status handler writes the distinct 64-byte PSP `SceKernelLwMutexInfo` layout, including UID and work-area pointer. Mailbox packet links are still host-side; `packetListHead` is written as zero and is not a complete PSP guest linked-list emulation.
 
 ### SysMemUserForUser
 - Added the `sceKernelSetCompiledSdkVersion600_602` alias using the existing SDK-version setter behavior.
