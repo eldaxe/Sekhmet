@@ -102,7 +102,6 @@ jobs:
             -DPython3_EXECUTABLE="$(command -v python3)" \
             -DPORTABLEKIT_ANDROID_APP=ON \
             -DPORTABLEKIT_RENDERER=ON \
-            -DPORTABLEKIT_FFMPEG=bundled \
             -DPSPRECOMP_BUILD_TESTS=OFF \
             -DPSPRECOMP_GENERATED_JOBS=1 \
             -DPSPRECOMP_GENERATED_OPT_LEVEL=1
