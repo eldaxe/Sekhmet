@@ -2,7 +2,7 @@
 
 Target: US PSP release `ULUS10563`, `APP_VER 01.00`.
 
-The exact 320-import static source-registration comparison is now committed in [GOD_EATER_BURST_HLE_IMPORT_AUDIT.md](GOD_EATER_BURST_HLE_IMPORT_AUDIT.md). On PortableKit `14f5fa2`, 277 imports have matching HLE registrations, 39 resolved imports have no matching registration, and 4 NIDs remain unresolved. These are source matches, not runtime-verified behavior.
+The current implementation and coverage summary is in [GOD_EATER_BURST_HLE_IMPLEMENTATION_UPDATE.md](GOD_EATER_BURST_HLE_IMPLEMENTATION_UPDATE.md). The latest static scan of PortableKit `god-eater-burst` finds 304 matching registrations out of 320 imports; 16 imports remain unregistered. This is not runtime verification. The older `GOD_EATER_BURST_HLE_IMPORT_AUDIT.md` is a historical pre-implementation baseline.
 
 ## Import inventory from EBOOT
 
