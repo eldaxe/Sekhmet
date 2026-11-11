@@ -25,7 +25,7 @@ The exact 320-import static source-registration comparison is now committed in [
 | sceNetAdhoc | 6 | 6 | 0 | 0 |
 | sceUmdUser | 9 | 6 | 3 | 0 |
 | scePower | 9 | 4 | 4 | 1 |
-| Other 15 libraries | 49 | 49 | 0 | 0 |
+| Other 15 libraries | 46 | 46 | 0 | 0 |
 
 See the linked audit for the complete 320-row inventory, exact NIDs, handler locations, and the list of 39 missing registrations plus 4 unresolved NIDs.
 
