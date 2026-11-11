@@ -2,30 +2,32 @@
 
 Target: US PSP release `ULUS10563`, `APP_VER 01.00`.
 
-The previous EBOOT audit summary reports 320 function imports across 32 library records. The original NID-by-NID CSV is not currently available in the Sekhmet repository, so the exact 320-entry comparison remains pending. This document is a tracking ledger; an import is not considered supported merely because a library name exists in PortableKit.
+The exact 320-import static source-registration comparison is now committed in [GOD_EATER_BURST_HLE_IMPORT_AUDIT.md](GOD_EATER_BURST_HLE_IMPORT_AUDIT.md). On PortableKit `14f5fa2`, 277 imports have matching HLE registrations, 39 resolved imports have no matching registration, and 4 NIDs remain unresolved. These are source matches, not runtime-verified behavior.
 
 ## Import inventory from EBOOT
 
-| Library | Import count | Audit status |
-|---|---:|---|
-| ThreadManForUser | 58 | Pending per-NID audit |
-| sceSasCore | 30 | Pending per-NID audit |
-| sceMpeg | 24 | Pending per-NID audit |
-| sceUtility | 15 | Pending per-NID audit |
-| IoFileMgrForUser | 14 | Pending per-NID audit |
-| sceRtc | 13 | Pending per-NID audit |
-| sceNetAdhocctl | 13 | Pending per-NID audit |
-| SysMemUserForUser | 12 | Pending per-NID audit |
-| sceJpeg | 12 | Pending per-NID audit |
-| sceGe_user | 11 | Pending per-NID audit |
-| sceAudio | 11 | Pending per-NID audit |
-| sceLibFont | 11 | Pending per-NID audit |
-| ModuleMgrForUser | 10 | Pending per-NID audit |
-| UtilsForUser | 10 | Pending per-NID audit |
-| scePower | 9 | Pending per-NID audit |
-| sceUmdUser | 9 | Pending per-NID audit |
-| Kernel_Library | 8 | Pending per-NID audit |
-| Other libraries | 50 | Exact per-library breakdown to be imported from the EBOOT audit |
+| Library | Imports | Registered | Missing | Unknown |
+|---|---:|---:|---:|---:|
+| ThreadManForUser | 58 | 49 | 9 | 0 |
+| sceSasCore | 30 | 30 | 0 | 0 |
+| sceMpeg | 24 | 24 | 0 | 0 |
+| sceUtility | 15 | 15 | 0 | 0 |
+| IoFileMgrForUser | 14 | 14 | 0 | 0 |
+| sceRtc | 13 | 10 | 3 | 0 |
+| sceNetAdhocctl | 13 | 11 | 2 | 0 |
+| SysMemUserForUser | 12 | 8 | 1 | 3 |
+| sceJpeg | 12 | 1 | 11 | 0 |
+| sceGe_user | 11 | 11 | 0 | 0 |
+| sceAudio | 11 | 11 | 0 | 0 |
+| sceLibFont | 11 | 11 | 0 | 0 |
+| sceAtrac3plus | 6 | 6 | 0 | 0 |
+| sceNetAdhocDiscover | 6 | 6 | 0 | 0 |
+| sceNetAdhoc | 6 | 6 | 0 | 0 |
+| sceUmdUser | 9 | 6 | 3 | 0 |
+| scePower | 9 | 4 | 4 | 1 |
+| Other 15 libraries | 49 | 49 | 0 | 0 |
+
+See the linked audit for the complete 320-row inventory, exact NIDs, handler locations, and the list of 39 missing registrations plus 4 unresolved NIDs.
 
 ## Status definitions
 
@@ -146,3 +148,12 @@ Ignored GE opcode diagnostics now retain up to four data values per opcode.
 Allegrex BREAK reports its encoded exception code but still stops: the PSP
 exception-vector/CP0 path has not been implemented. These are diagnostic and
 initial HLE changes, not a claim that the reported game assertion is fixed.
+
+
+## Current source audit update (2026-11-12)
+
+- PortableKit `god-eater-burst` commit `14f5fa2736423767c5eb845492101ad269f1ef47` now has matching registrations for all 30 imported `sceSasCore` functions and all 4 imported `sceMd5` functions.
+- The 3 previously missing SAS ATRAC3 entry points now have registrations. Reverb calls remain success-returning no-op shims.
+- `sceJpeg` still has only `sceJpegCsc` registered; 11 MJPEG imports are missing.
+- Sekhmet's build no longer compiles `hle/geburst_crypto`, avoiding a second MD5 implementation alongside PortableKit's built-in handlers. The old extension source remains in the repository but is not part of the build.
+- This is a static audit only. Build, device boot, and per-function behavior still require validation.
