@@ -25,7 +25,7 @@ The decrypted EBOOT import scan identified 320 function imports across 32 librar
 | scePower | 9 | Pending per-NID audit |
 | sceUmdUser | 9 | Pending per-NID audit |
 | Kernel_Library | 8 | Pending per-NID audit |
-| Other libraries | 40 | Exact per-library breakdown to be imported from the EBOOT audit |
+| Other libraries | 50 | Exact per-library breakdown to be imported from the EBOOT audit |
 
 ## Status definitions
 
