@@ -131,3 +131,18 @@ reported runtime stop. The missing texture-pack folder is informational.
    do not convert it to a NOP.
 5. Provide a valid TTF/OTF font to distinguish UI text rendering from the
    HLE/runtime failure.
+
+
+## Follow-up implementation status (2026-11-12)
+
+PortableKit's `god-eater-burst` branch now has an initial PPSSPP-referenced
+implementation of `sceKernelSetAlarm`, `sceKernelSetSysClockAlarm`,
+`sceKernelCancelAlarm`, and `sceKernelReferAlarmStatus`. The alarm handlers
+run through the guest interrupt-call path, with virtual microsecond deadlines
+and repeat/stop behavior from the handler return value. This code has been
+committed but is not yet build- or device-validated.
+
+Ignored GE opcode diagnostics now retain up to four data values per opcode.
+Allegrex BREAK reports its encoded exception code but still stops: the PSP
+exception-vector/CP0 path has not been implemented. These are diagnostic and
+initial HLE changes, not a claim that the reported game assertion is fixed.
