@@ -1,0 +1,127 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-arm64:
+    name: Build Sekhmet Android arm64-v8a APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout Sekhmet and pinned PortableKit
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - name: Install Android SDK components
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+
+      - name: Install native build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build glslang-tools imagemagick librsvg2-bin bc nasm yasm pkg-config
+          sudo ln -sf "$(command -v convert)" /usr/local/bin/magick
+
+      - name: Checkout SDL3
+        uses: actions/checkout@v4
+        with:
+          repository: libsdl-org/SDL
+          ref: release-3.2.16
+          path: .deps/SDL
+          persist-credentials: false
+
+      - name: Build and install SDL3 for Android
+        run: |
+          cmake -S .deps/SDL -B .deps/sdl-build -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=29 \
+            -DSDL_SHARED=ON \
+            -DSDL_STATIC=OFF \
+            -DSDL_TESTS=OFF \
+            -DSDL_TEST_LIBRARY=OFF \
+            -DSDL_INSTALL=ON \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/.deps/sdl-install"
+          cmake --build .deps/sdl-build --parallel 2
+          cmake --install .deps/sdl-build
+
+      - name: Generate Sekhmet launcher icons
+        run: |
+          mkdir -p android-res
+          portablekit/packaging/android/make_icons.sh android-res/emblem.svg android-res
+
+      - name: Verify Android renderer dependencies
+        run: |
+          SDL3_CONFIG="$GITHUB_WORKSPACE/.deps/sdl-install/lib/cmake/SDL3/SDL3Config.cmake"
+          VULKAN_INCLUDE="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include"
+          VULKAN_LIBRARY="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/29/libvulkan.so"
+          test -f "$SDL3_CONFIG" || { echo "Missing SDL3 CMake package: $SDL3_CONFIG"; exit 1; }
+          test -f "$VULKAN_INCLUDE/vulkan/vulkan.h" || { echo "Missing Vulkan headers: $VULKAN_INCLUDE"; exit 1; }
+          test -f "$VULKAN_LIBRARY" || { echo "Missing Android Vulkan loader: $VULKAN_LIBRARY"; exit 1; }
+          command -v glslangValidator
+          command -v python3
+
+      - name: Configure Android native runtime
+        run: |
+          cmake -S . -B out/android -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=29 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/.deps/sdl-install" \
+            -DSDL3_DIR="$GITHUB_WORKSPACE/.deps/sdl-install/lib/cmake/SDL3" \
+            -DVulkan_INCLUDE_DIR="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include" \
+            -DVulkan_LIBRARY="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/29/libvulkan.so" \
+            -DPORTABLEKIT_GLSLANG="$(command -v glslangValidator)" \
+            -DPython3_EXECUTABLE="$(command -v python3)" \
+            -DPORTABLEKIT_ANDROID_APP=ON \
+            -DPORTABLEKIT_RENDERER=ON \
+            -DPORTABLEKIT_FFMPEG=bundled \
+            -DPSPRECOMP_BUILD_TESTS=OFF \
+            -DPSPRECOMP_GENERATED_JOBS=1 \
+            -DPSPRECOMP_GENERATED_OPT_LEVEL=1
+          cmake --build out/android --target SekhmetNative --parallel 2
+
+      - name: Package signed APK
+        env:
+          APP_ID: com.eldaxe.sekhmet
+          GAME_RES: ${{ github.workspace }}/android-res
+          DEBUGGABLE: '1'
+        run: |
+          portablekit/packaging/android/build_apk.sh \
+            out/android .deps/SDL .deps/sdl-install/lib/libSDL3.so \
+            out/Sekhmet-arm64-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sekhmet-Android-arm64-debug
+          path: out/Sekhmet-arm64-debug.apk
+          if-no-files-found: error
+          retention-days: 14
