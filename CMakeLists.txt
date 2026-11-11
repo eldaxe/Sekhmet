@@ -6,6 +6,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/portablekit/CMakeLists.txt")
 endif()
 
 add_subdirectory(portablekit)
+add_subdirectory(hle/geburst_crypto)
 
 portablekit_add_game(SekhmetNative
     PROFILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
