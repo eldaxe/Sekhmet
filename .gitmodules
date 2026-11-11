@@ -1,3 +1,4 @@
 [submodule "portablekit"]
 	path = portablekit
 	url = https://github.com/eldaxe/PortableKit.git
+	branch = god-eater-burst
