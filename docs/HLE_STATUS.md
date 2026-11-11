@@ -84,3 +84,50 @@ and whether the function is reached during boot. Use PPSSPP as a behavioral
 reference, not as a source to copy blindly.
 
 Do not use the God Eater 2 / NPJH50832 import inventory for this target.
+
+
+## Runtime trace: first Android boot (log.txt, 2026-11-12)
+
+Observed facts from the submitted run:
+
+- Vulkan initializes on Adreno 650 at a 960x544 guest target; audio opens at 44.1 kHz stereo.
+- The executable hash matches the documented decrypted ULUS10563 ELF.
+- UMD reaches MEDIA_IN, READY and READABLE; the guest opens
+  `disc0:/PSP_GAME/USRDIR/package.rdp`.
+- Stock HLE metadata modules `libfont.prx`, `libdeflt.prx`, `libccc.prx`,
+  and `libmd5.prx` are registered, but their PRX code is not mapped.
+- The HLE extension reports four unused MD5 functions because PortableKit
+  already implements them. This is expected duplicate suppression, not a crash.
+- The first logged HLE stub is `UtilsForUser::sceKernelGetGPI`.
+- The next blocking unknown import is
+  `ThreadManForUser::0x6652B8CA`, with
+  `a0=0x00000BB8`, `a1=0x08830998`, `a2=0x08A89A5C`,
+  `a3=0x08A89B44`, `ra=0x08831F84`.
+- PSP NID status identifies `0x6652B8CA` as `sceKernelSetAlarm`.
+  The exact call semantics and argument interpretation still need validation
+  against PSP documentation / a known implementation before adding a handler.
+- Immediately after that stub, the game reports
+  `assert : src/fw/frame.c 826`.
+- Later the interpreter stops on word `0x0000000D` at
+  `0x088102CC`, decoded as a MIPS/Allegrex `break` instruction. Since the
+  guest has just reported an assertion, this may be the game's deliberate
+  assertion trap. Do not silently skip it; capture the exception code and
+  guest call stack / PC context first.
+- The run records 61 distinct ignored GE command opcodes. The displayed
+  `first=0x0` for every opcode is insufficient to infer their intended
+  parameters; inspect the GE command capture path and raw command words.
+
+The font warning (no TrueType font) explains blank game text but is not the
+reported runtime stop. The missing texture-pack folder is informational.
+
+### Immediate next diagnostics
+
+1. Resolve `sceKernelSetAlarm` with the exact PSP ABI and timer/callback
+   behavior; add a real implementation, not a success stub.
+2. Capture the guest backtrace and the code around `0x08831F84`,
+   `0x088102CC`, and the assertion site.
+3. Decode and retain raw GE command words, not only opcode counts.
+4. Fix Allegrex `break` by implementing the correct guest exception path;
+   do not convert it to a NOP.
+5. Provide a valid TTF/OTF font to distinguish UI text rendering from the
+   HLE/runtime failure.
