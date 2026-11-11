@@ -50,3 +50,37 @@ The previous EBOOT audit summary reports 320 function imports across 32 library 
 - Import inventory: 320 function imports in 32 library records.
 
 The complete NID-by-NID list must be regenerated from the decrypted ULUS10563 EBOOT and committed as a plain-text audit artifact (no executable bytes). Counts above are a starting inventory, not a claim that the functions are implemented.
+
+## Current source audit (2026-11-12)
+
+The first shared-framework audit found that PortableKit already registers the four standard
+`sceMd5` imports in `host/hle/hle_system.cpp`:
+
+| NID | Function | Owner |
+|---|---|---|
+| `0x19884A15` | `sceMd5BlockInit` | PortableKit |
+| `0xA30206C2` | `sceMd5BlockUpdate` | PortableKit |
+| `0x4876AFFF` | `sceMd5BlockResult` | PortableKit |
+| `0x98E31A9E` | `sceMd5Digest` | PortableKit |
+
+Sekhmet previously compiled a second implementation of these same functions from
+`hle/geburst_crypto`. That duplicate extension has been removed from the Sekhmet
+build: the framework implementation is now the single owner. This is not a claim
+that the four calls have been exercised by ULUS10563 at runtime.
+
+PortableKit's existing ThreadMan implementation also covers many kernel facilities
+(thread lifecycle, waits, semaphores, event flags, mutexes, callbacks, timers,
+mailboxes, VPL/FPL and message pipes). Presence in source is not enough to mark
+the corresponding ULUS10563 NIDs verified; the exact import table and runtime
+call trace are still required.
+
+## Next audit gate
+
+Before adding more HLE, produce the decrypted ULUS10563 import inventory as
+`library,NID,name` rows and compare each row with PortableKit's actual HLE
+registration. For each missing or partial import, record the first call site,
+argument registers, guest memory inputs/outputs, expected PSP error behavior,
+and whether the function is reached during boot. Use PPSSPP as a behavioral
+reference, not as a source to copy blindly.
+
+Do not use the God Eater 2 / NPJH50832 import inventory for this target.
