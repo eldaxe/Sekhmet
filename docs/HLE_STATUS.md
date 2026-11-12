@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `5030370987270d2bc9ac0c96936b3d0d40c12d31`.
+PortableKit source: branch `god-eater-burst`, commit `67d251cd70fe9c9e1f9e5d9d70e760eb436fdff0`.
 
 ## Current static import coverage
 
@@ -89,3 +89,5 @@ MJPEG decoder initialization now cleans up partially allocated FFmpeg objects on
 TLS pools with the PSP priority attribute now order waiting threads by their current kernel thread priority (stable FIFO for equal priorities); FIFO remains the default when the priority attribute is absent.
 
 MJPEG CSC now enforces the MJPEG initialization state, supports the documented negative buffer-width encoding used by the MJPEG CSC path, and validates the known `sceJpegCsc` chroma subsampling values.
+
+MJPEG HLE lambdas now refer to the function-local static decoder state without attempting to capture a static-storage object. This was corrected proactively before the next Android build.
