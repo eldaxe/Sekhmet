@@ -55,4 +55,4 @@ See [GOD_EATER_BURST_HLE_IMPLEMENTATION_UPDATE.md](GOD_EATER_BURST_HLE_IMPLEMENT
 
 PortableKit now models the thread-event handler object registry and the register, release and status-query APIs. The status structure matches the PSP SDK layout. Actual event dispatch to guest callback functions for thread create/start/exit/delete is still pending.
 
-The remaining static import gaps are 11 `sceJpeg` MJPEG APIs and `sceKernelReferTlsplStatus`. No native build or Android device test has been run.
+The remaining documented import gaps are 11 `sceJpeg` MJPEG APIs and `sceKernelReferTlsplStatus`. No native build or Android device test has been run.

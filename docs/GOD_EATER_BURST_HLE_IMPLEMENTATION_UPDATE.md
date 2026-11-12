@@ -103,10 +103,10 @@ Sekhmet's build no longer compiles `hle/geburst_crypto`; PortableKit owns the fo
 | Library | Missing |
 |---|---:|
 | `sceJpeg` | 11 |
-| `ThreadManForUser` | 2 |
-| **Total** | **13** |
+| `ThreadManForUser` | 1 |
+| **Total** | **12** |
 
-ThreadMan gaps: `sceKernelReferThreadEventHandlerStatus` and `sceKernelReferTlsplStatus`.
+ThreadMan gap: `sceKernelReferTlsplStatus`.
 
 ## Validation
 - GitHub source and NID mapping changes committed.
@@ -114,11 +114,12 @@ ThreadMan gaps: `sceKernelReferThreadEventHandlerStatus` and `sceKernelReferTlsp
 - No native build or device test was run; runtime behavior remains unverified.
 
 
-## Thread event handler follow-up (PortableKit b2c0a03)
+## Thread event handler follow-up (PortableKit 7443b43)
 
 - Added a runtime registry for thread event handler metadata.
 - Added `sceKernelRegisterThreadEventHandler` (NID `0x0C106E53`), `sceKernelReleaseThreadEventHandler` (NID `0x72F3C145`), and `sceKernelReferThreadEventHandlerStatus` (NID `0x369EEB6B`).
-- Status output follows the PSP SDK structure: size, name[32], thread ID, mask, handler address, common argument.
+- Status output follows the PSP SDK structure: size, name[32], thread ID, mask, handler address, common argument; output writes are bounded by both the caller-supplied size and guest-memory range.
+- Registration accepts the PSP thread selectors CURRENT, ALL_USER, ALL_KERNEL and ALL; CURRENT remains restricted to EXIT events. Zero event mask is accepted.
 - `sceKernelGetThreadmanIdList` type 9 now enumerates registered thread-event handler UIDs.
 - Important limitation: handler registration and metadata are modelled, but event delivery (CREATE/START/EXIT/DELETE callback execution) is not yet wired into thread lifecycle. This is not full thread-event emulation.
 - `sceKernelReferTlsplStatus` remains unimplemented; a correct TLS pool requires allocation ownership, per-thread cleanup, wait queues and object status, not a fabricated status response.
