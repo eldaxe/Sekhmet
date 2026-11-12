@@ -53,6 +53,6 @@ See [GOD_EATER_BURST_HLE_IMPLEMENTATION_UPDATE.md](GOD_EATER_BURST_HLE_IMPLEMENT
 
 ## Latest thread-event handler update
 
-PortableKit now models the thread-event handler object registry and the register, release and status-query APIs. The status structure matches the PSP SDK layout. Actual event dispatch to guest callback functions for thread create/start/exit/delete is still pending.
+PortableKit now models the thread-event handler object registry and the register, release and status-query APIs. The status structure matches the PSP SDK layout. PortableKit now dispatches guest callbacks for CREATE, START, EXIT and DELETE. CURRENT is bound to the registering thread; ALL_USER and ALL are supported for modeled user threads. ALL_KERNEL is accepted but cannot match because this runtime does not model kernel threads.
 
-The remaining documented import gaps are 11 `sceJpeg` MJPEG APIs and `sceKernelReferTlsplStatus`. No native build or Android device test has been run.
+The remaining documented import gaps are 11 `sceJpeg` MJPEG APIs and `sceKernelReferTlsplStatus`. Lifecycle dispatch is source-reviewed only; no native build or Android device test has been run.

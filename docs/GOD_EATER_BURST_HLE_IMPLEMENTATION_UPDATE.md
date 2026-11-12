@@ -114,12 +114,12 @@ ThreadMan gap: `sceKernelReferTlsplStatus`.
 - No native build or device test was run; runtime behavior remains unverified.
 
 
-## Thread event handler follow-up (PortableKit 7443b43)
+## Thread event handler follow-up (PortableKit 7443b43, lifecycle dispatch 4b903bc)
 
 - Added a runtime registry for thread event handler metadata.
 - Added `sceKernelRegisterThreadEventHandler` (NID `0x0C106E53`), `sceKernelReleaseThreadEventHandler` (NID `0x72F3C145`), and `sceKernelReferThreadEventHandlerStatus` (NID `0x369EEB6B`).
 - Status output follows the PSP SDK structure: size, name[32], thread ID, mask, handler address, common argument; output writes are bounded by both the caller-supplied size and guest-memory range.
 - Registration accepts the PSP thread selectors CURRENT, ALL_USER, ALL_KERNEL and ALL; CURRENT remains restricted to EXIT events. Zero event mask is accepted.
 - `sceKernelGetThreadmanIdList` type 9 now enumerates registered thread-event handler UIDs.
-- Important limitation: handler registration and metadata are modelled, but event delivery (CREATE/START/EXIT/DELETE callback execution) is not yet wired into thread lifecycle. This is not full thread-event emulation.
+- Important limitation: guest callbacks are now dispatched for CREATE, START, EXIT and DELETE. Handlers run in registration order and receive `(eventMask, threadId, commonArg)`. CURRENT is bound to the registering thread and remains EXIT-only. ALL_USER and ALL cover modeled user threads; ALL_KERNEL is accepted but has no kernel-thread objects to match. This remains source-reviewed, not runtime-verified; callback reentrancy and in-flight handler release still need tests.
 - `sceKernelReferTlsplStatus` remains unimplemented; a correct TLS pool requires allocation ownership, per-thread cleanup, wait queues and object status, not a fabricated status response.
