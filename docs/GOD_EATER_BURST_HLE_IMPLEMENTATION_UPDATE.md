@@ -123,3 +123,14 @@ ThreadMan gap: `sceKernelReferTlsplStatus`.
 - `sceKernelGetThreadmanIdList` type 9 now enumerates registered thread-event handler UIDs.
 - Important limitation: guest callbacks are now dispatched for CREATE, START, EXIT and DELETE. Handlers run in registration order and receive `(eventMask, threadId, commonArg)`. CURRENT is bound to the registering thread and remains EXIT-only. ALL_USER and ALL cover modeled user threads; ALL_KERNEL is accepted but has no kernel-thread objects to match. This remains source-reviewed, not runtime-verified; callback reentrancy and in-flight handler release still need tests.
 - `sceKernelReferTlsplStatus` remains unimplemented; a correct TLS pool requires allocation ownership, per-thread cleanup, wait queues and object status, not a fabricated status response.
+
+
+## TLS pool and callback reentrancy follow-up (PortableKit d8136f4)
+
+PortableKit now models TLS pool lifecycle and `sceKernelReferTlsplStatus`, including per-thread allocation ownership, zeroing on allocate/free, thread-exit cleanup, FIFO wait queue behavior, the 60-byte status structure, and ThreadMan ID-list type 12. `sceKernelGetTlsAddr` is registered in `Kernel_Library`. Error codes are aligned with PPSSPP's PSP kernel definitions.
+
+Thread-event callback dispatch now snapshots UIDs and checks that each handler still exists before invoking it. This prevents a callback from causing a later released handler to run. The guest-call stack remains per thread so a callback can block and resume or make a nested guest call. This is not yet runtime-tested.
+
+The 11 MJPEG imports remain outstanding. Do not treat their registration or decoding as implemented until the FFmpeg/JPEG decode and YCbCr paths are wired and tested.
+
+Validation: source review only. No native NDK build or device test has been completed.
