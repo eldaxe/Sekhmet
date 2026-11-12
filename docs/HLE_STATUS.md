@@ -108,3 +108,8 @@ PortableKit CI now also runs on pushes to `god-eater-burst`, so the new thread-e
 ## Callback test compile fix (PortableKit 0aaa194)
 
 The Android NDK build diagnosed template argument deduction failure in `dispatch_thread_event_chain`: the completion lambda could not be deduced as a `std::function` parameter. The helper now takes a separately deduced `Complete` callable type for the completion continuation. This keeps the production callback path and the test helper generic without forcing a lambda-to-`std::function` conversion during template deduction.
+
+
+## Android RTC compile fix (PortableKit 37da83a)
+
+The Android NDK build rejected `std::mktime(&local_copy)` because `local_copy` was declared `const std::tm`. PortableKit now declares this local copy as mutable `std::tm`, matching the standard C time API signature. The conversion algorithm is otherwise unchanged. Sekhmet's submodule is updated to this PortableKit commit.
