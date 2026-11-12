@@ -2,16 +2,16 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`.
 PortableKit branch: `god-eater-burst`.
-PortableKit commit: `796c1e0d3b733eda20fbdc09811ece3f065dae58`.
+PortableKit commit: `72d83d0b5e6a3ebf65ea7843663361d75ef8018b`.
 
 ## Current static import coverage
 
-The original EBOOT inventory contains 320 unique imports in 32 libraries. The latest source scan, including literal-name registration loops and local `configs/nids.csv` mappings, finds:
+The original EBOOT inventory contains 320 unique imports in 32 libraries. The latest static source scan, including literal-name registration loops and local `configs/nids.csv` mappings, finds 307 matching registrations and 13 unregistered imports. The six `UtilsForUser` imports registered through a multiline literal-name loop are counted as implemented.
 
 | Status | Count |
 |---|---:|
-| Matching HLE registrations | 304 |
-| Imports without a matching registration | 16 |
+| Matching HLE registrations | 307 |
+| Imports without a matching registration | 13 |
 | Total | 320 |
 
 This is a static source-registration result, not a runtime or semantic completeness claim. Five function-name mappings are supplied by the local NID configuration but are not exact name matches in the external PPSSPP NID database; the local import config is retained for those names.
@@ -81,3 +81,34 @@ Sekhmet's build no longer compiles `hle/geburst_crypto`; PortableKit owns the fo
 - No local Android/Termux build was performed.
 - No device boot or runtime test was performed.
 - Status structure layouts were implemented from documented PSP layouts and cross-checked against PPSSPP; the new handlers still need runtime tests with God Eater Burst.
+
+
+## Follow-up implementation (PortableKit 72d83d0)
+
+### ThreadManForUser
+- Added `sceKernelGetThreadmanIdList` (NID `0x94416130`).
+- Supports ID enumeration for threads, semaphores, event flags, mailboxes, VPLs, FPLs, message pipes, callbacks, alarms, and VTimers.
+- Supports the sleep, delay, suspended, and dormant thread categories.
+- Checks buffer capacity, output pointers, and invalid type values.
+- Thread-event-handler enumeration (type 9) currently returns an empty list because the runtime has no thread-event-handler registry.
+- `sceKernelReferThreadEventHandlerStatus` and `sceKernelReferTlsplStatus` remain unregistered; thread-event handler and TLS pool objects are not modelled yet.
+
+### sceSasCore
+- Removed duplicate registrations of `__sceSasGetAllEnvelopeHeights` and `__sceSasGetPauseFlag`.
+- Kept the implementation that returns the live per-voice envelope values and pause bitmask.
+- Added complete guest output-range validation before writing all 32 envelope values.
+
+## Updated remaining unregistered imports
+
+| Library | Missing |
+|---|---:|
+| `sceJpeg` | 11 |
+| `ThreadManForUser` | 2 |
+| **Total** | **13** |
+
+ThreadMan gaps: `sceKernelReferThreadEventHandlerStatus` and `sceKernelReferTlsplStatus`.
+
+## Validation
+- GitHub source and NID mapping changes committed.
+- Static source inspection confirms one registration each for the two SAS query handlers.
+- No native build or device test was run; runtime behavior remains unverified.
