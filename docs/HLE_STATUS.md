@@ -101,3 +101,5 @@ PortableKit now factors the thread-event callback chain into a small continuatio
 ## ThreadMan namespace build fix (PortableKit 2a600a3)
 
 The Android build reached native C++ compilation and identified an extra closing brace at the end of `hle_threadman.cpp`, which placed `register_threadman()` outside `namespace portablekit`. The extra brace has been removed. The callback continuation helper and its host regression tests remain included in the PortableKit submodule.
+
+PortableKit CI now also runs on pushes to `god-eater-burst`, so the new thread-event continuation helper and `portablekit_thread_event_tests` are checked directly on the working branch rather than only through Sekhmet's Android build.
