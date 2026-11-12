@@ -113,3 +113,8 @@ The Android NDK build diagnosed template argument deduction failure in `dispatch
 ## Android RTC compile fix (PortableKit 37da83a)
 
 The Android NDK build rejected `std::mktime(&local_copy)` because `local_copy` was declared `const std::tm`. PortableKit now declares this local copy as mutable `std::tm`, matching the standard C time API signature. The conversion algorithm is otherwise unchanged. Sekhmet's submodule is updated to this PortableKit commit.
+
+
+## MJPEG static-state lambda capture fix (PortableKit 1f9f680)
+
+Android Clang reported that `sceJpegDecodeMJpeg` and `sceJpegDecodeMJpegSuccessively` attempted to capture the function-local `static JpegState jpeg` by reference. Static-storage variables cannot appear in a lambda capture list and are directly accessible from the lambda. Both captures have been removed; the handlers continue to refer to the same shared static decoder state. Sekhmet's `portablekit` gitlink is updated to this commit.
