@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `d8136f437bd71c47572011c5c54d8355696011df`.
+PortableKit source: branch `god-eater-burst`, commit `d20be3b37aa1f6519c164a870a95407dee729732`.
 
 ## Current static import coverage
 
@@ -11,18 +11,17 @@ The original EBOOT import inventory contains 320 unique imports in 32 libraries.
 | Library | Imports | Registered | Missing |
 |---|---:|---:|---:|
 | ThreadManForUser | 58 | 58 | 0 |
-| sceJpeg | 12 | 1 | 11 |
+| sceJpeg | 12 | 12 | 0 |
 | sceNetAdhocctl | 13 | 13 | 0 |
 | UtilsForUser | 10 | 10 | 0 |
 | Other libraries | 227 | 227 | 0 |
-| **Total** | **320** | **309** | **11** |
+| **Total** | **320** | **320** | **0** |
 
 The six UtilsForUser functions implemented by a multiline literal-name loop are included in the registered count. This is a static registration audit, not proof of semantic completeness or successful execution on hardware.
 
 ## Remaining import gaps
 
-- `sceJpeg`: 11 MJPEG lifecycle/decode functions. Only `sceJpegCsc` is registered.
-- `ThreadManForUser`: no remaining missing imports in the current static registration audit. TLS pool semantics and callback reentrancy still require runtime tests.
+- No missing imports in the current static registration audit. JPEG decoder output, color conversion, TLS wait behavior, and callback reentrancy still require runtime tests.
 
 `sceKernelGetThreadmanIdList` is now registered and enumerates the object registries currently modelled by PortableKit. Thread-event-handler type 9 enumerates the registered handler objects.
 
@@ -64,3 +63,11 @@ The remaining documented import gaps are the 11 `sceJpeg` MJPEG APIs. TLS pool c
 - Corrected TLS error values to the PSP SDK values: UNKNOWN_TLSPL_ID `0x800201D0`, TOO_MANY_TLSPL `0x800201D1`, TLSPL_IN_USE `0x800201D2`.
 - Callback dispatch snapshots handler UIDs and re-checks registration before invocation, so a handler released during a preceding callback is skipped. An executing handler may return normally.
 - Still unverified: blocking/nested callback execution, TLS wait contention/timeouts, and Android device behavior. No native build has been completed for this update.
+
+
+## MJPEG implementation follow-up (PortableKit d20be3b)
+
+- Added a host MJPEG decoder using FFmpeg's `AV_CODEC_ID_MJPEG`, enabled in the bundled FFmpeg decoder configuration.
+- Registered the remaining 11 sceJpeg imports: MJPEG init/create/delete/finish, RGB decode and successive decode, YCbCr decode and successive decode, output-info query, MJPEG CSC and CSC with color option. The existing `sceJpegCsc` now shares the picture conversion path.
+- Decoder output is normalized to planar YCbCr 4:2:0, including 4:2:2/4:4:4 source chroma subsampling and grayscale input. Guest output buffers are range-checked; MJPEG CSC crops luma and chroma planes to the requested dimensions.
+- This closes the static import-registration gap only. Decoder format support, API edge cases, guest buffer layout, output color ordering, and timing remain unverified on PSP game data and Android. Native build/CI must pass before treating this as complete.

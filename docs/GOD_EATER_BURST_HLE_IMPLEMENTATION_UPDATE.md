@@ -134,3 +134,10 @@ Thread-event callback dispatch now snapshots UIDs and checks that each handler s
 The 11 MJPEG imports remain outstanding. Do not treat their registration or decoding as implemented until the FFmpeg/JPEG decode and YCbCr paths are wired and tested.
 
 Validation: source review only. No native NDK build or device test has been completed.
+
+
+## MJPEG HLE update (PortableKit d20be3b)
+
+PortableKit now has an FFmpeg MJPEG decoder and registers the remaining 11 sceJpeg MJPEG APIs, alongside the existing CSC entry point. The decoder converts supported planar JPEG output to the runtime's YCbCr 4:2:0 picture layout, and the HLE implements RGB decode, YCbCr decode, output-info query, CSC, and MJPEG init/create/delete/finish state transitions. CSC now copies/crops the source planes rather than changing dimensions over the original un-cropped buffers.
+
+This update closes the static import registration audit (320/320 names registered), but is not yet runtime-verified. Native build, tests using actual JPEG samples, God Eater Burst movie playback, and Android device validation are still required. Do not interpret the static count as proof of exact PSP behavior.
