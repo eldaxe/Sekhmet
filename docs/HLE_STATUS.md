@@ -118,3 +118,8 @@ The Android NDK build rejected `std::mktime(&local_copy)` because `local_copy` w
 ## MJPEG static-state lambda capture fix (PortableKit 1f9f680)
 
 Android Clang reported that `sceJpegDecodeMJpeg` and `sceJpegDecodeMJpegSuccessively` attempted to capture the function-local `static JpegState jpeg` by reference. Static-storage variables cannot appear in a lambda capture list and are directly accessible from the lambda. Both captures have been removed; the handlers continue to refer to the same shared static decoder state. Sekhmet's `portablekit` gitlink is updated to this commit.
+
+
+## TLS pool import NID registration (PortableKit d3379f0)
+
+The runtime had implementations for `sceKernelCreateTlspl`, `sceKernelDeleteTlspl`, `sceKernelFreeTlspl`, `sceKernelReferTlsplStatus`, and `sceKernelGetTlsAddr`, but the PortableKit import database did not list Create/Delete/Free/Get. Added verified PSP NIDs: Create `0x8DAFF657`, Delete `0x32BF938E`, Free `0x4A719FB2`, and GetTlsAddr `0xFA835CDE`. The existing Refer status NID `0x721067F3` remains. The game log's `Unknown HLE function ... sceKernelCreateTlspl` is therefore addressed at the import-database layer as well as the C++ handler layer. This does not yet confirm all TLS pool semantics or runtime startup.
