@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `59b38ba26eb3fe7490838bf0b3d0f89fa8377c01`.
+PortableKit source: branch `god-eater-burst`, commit `57cbc9476afe855c1ae6cbd937764f18f1d0bc6b`.
 
 ## Current static import coverage
 
@@ -76,3 +76,8 @@ The remaining documented import gaps are the 11 `sceJpeg` MJPEG APIs. TLS pool c
 ## TLS partition validation correction (PortableKit 59b38ba)
 
 TLS pool creation now accepts PSP partition IDs 1 through 6 instead of requiring one hard-coded partition ID. PortableKit currently maps the PSP high-memory attribute to its host high/low allocator; it does not yet emulate all six distinct PSP partition allocators. This compatibility limitation is explicit and requires game/runtime validation.
+
+
+## Android build correction (PortableKit 57cbc94)
+
+The first Sekhmet build using the callback/TLS changes exposed a missing closing brace after `register_msg_pipes()`, which caused the following ID-list registration function to be parsed as nested. This has been corrected. The updated PortableKit submodule is pinned below; a new Android build is required to verify this fix and compile the MJPEG implementation.
