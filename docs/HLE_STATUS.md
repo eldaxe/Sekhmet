@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `ed650cc7f5215afb83dc872eee4e02149929d6e1`.
+PortableKit source: branch `god-eater-burst`, commit `355190a613a2559be43fbdc1108a096fab96e736`.
 
 ## Current static import coverage
 
@@ -83,3 +83,5 @@ TLS pool creation now accepts PSP partition IDs 1 through 6 instead of requiring
 The first Sekhmet build using the callback/TLS changes exposed a missing closing brace after `register_msg_pipes()`, which caused the following ID-list registration function to be parsed as nested. This has been corrected. The updated PortableKit submodule is pinned below; a new Android build is required to verify this fix and compile the MJPEG implementation.
 
 TLS pool validation additionally accepts the PSP priority attribute (`0x0100`) together with high-memory (`0x4000`), matching the known PSP attribute mask `0x4100`. Priority waiter ordering is still FIFO in the current host implementation.
+
+MJPEG decoder initialization now cleans up partially allocated FFmpeg objects on failure, configures the codec before opening it, and rejects packed RGB pixel formats rather than misinterpreting their planes as YCbCr. The next Android CI run should compile this decoder path.
