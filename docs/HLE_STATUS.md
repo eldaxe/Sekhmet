@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `21c4b1b84f51f5f271332668e2fcfc17487f447c`.
+PortableKit source: branch `god-eater-burst`, commit `5030370987270d2bc9ac0c96936b3d0d40c12d31`.
 
 ## Current static import coverage
 
@@ -87,3 +87,5 @@ TLS pool validation additionally accepts the PSP priority attribute (`0x0100`) t
 MJPEG decoder initialization now cleans up partially allocated FFmpeg objects on failure, configures the codec before opening it, and rejects packed RGB pixel formats rather than misinterpreting their planes as YCbCr. The next Android CI run should compile this decoder path.
 
 TLS pools with the PSP priority attribute now order waiting threads by their current kernel thread priority (stable FIFO for equal priorities); FIFO remains the default when the priority attribute is absent.
+
+MJPEG CSC now enforces the MJPEG initialization state, supports the documented negative buffer-width encoding used by the MJPEG CSC path, and validates the known `sceJpegCsc` chroma subsampling values.
