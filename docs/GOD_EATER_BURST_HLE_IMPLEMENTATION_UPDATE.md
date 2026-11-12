@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`.
 PortableKit branch: `god-eater-burst`.
-PortableKit commit: `72d83d0b5e6a3ebf65ea7843663361d75ef8018b`.
+PortableKit commit: `b2c0a039edd01de25c804eb7b1b27ee79eefba13`.
 
 ## Current static import coverage
 
@@ -112,3 +112,13 @@ ThreadMan gaps: `sceKernelReferThreadEventHandlerStatus` and `sceKernelReferTlsp
 - GitHub source and NID mapping changes committed.
 - Static source inspection confirms one registration each for the two SAS query handlers.
 - No native build or device test was run; runtime behavior remains unverified.
+
+
+## Thread event handler follow-up (PortableKit b2c0a03)
+
+- Added a runtime registry for thread event handler metadata.
+- Added `sceKernelRegisterThreadEventHandler` (NID `0x0C106E53`), `sceKernelReleaseThreadEventHandler` (NID `0x72F3C145`), and `sceKernelReferThreadEventHandlerStatus` (NID `0x369EEB6B`).
+- Status output follows the PSP SDK structure: size, name[32], thread ID, mask, handler address, common argument.
+- `sceKernelGetThreadmanIdList` type 9 now enumerates registered thread-event handler UIDs.
+- Important limitation: handler registration and metadata are modelled, but event delivery (CREATE/START/EXIT/DELETE callback execution) is not yet wired into thread lifecycle. This is not full thread-event emulation.
+- `sceKernelReferTlsplStatus` remains unimplemented; a correct TLS pool requires allocation ownership, per-thread cleanup, wait queues and object status, not a fabricated status response.

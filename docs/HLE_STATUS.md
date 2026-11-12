@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `72d83d0b5e6a3ebf65ea7843663361d75ef8018b`.
+PortableKit source: branch `god-eater-burst`, commit `b2c0a039edd01de25c804eb7b1b27ee79eefba13`.
 
 ## Current static import coverage
 
@@ -10,12 +10,12 @@ The original EBOOT import inventory contains 320 unique imports in 32 libraries.
 
 | Library | Imports | Registered | Missing |
 |---|---:|---:|---:|
-| ThreadManForUser | 58 | 56 | 2 |
+| ThreadManForUser | 58 | 57 | 1 |
 | sceJpeg | 12 | 1 | 11 |
 | sceNetAdhocctl | 13 | 13 | 0 |
 | UtilsForUser | 10 | 10 | 0 |
 | Other libraries | 227 | 227 | 0 |
-| **Total** | **320** | **307** | **13** |
+| **Total** | **320** | **308** | **12** |
 
 The six UtilsForUser functions implemented by a multiline literal-name loop are included in the registered count. This is a static registration audit, not proof of semantic completeness or successful execution on hardware.
 
@@ -23,10 +23,10 @@ The six UtilsForUser functions implemented by a multiline literal-name loop are 
 
 - `sceJpeg`: 11 MJPEG lifecycle/decode functions. Only `sceJpegCsc` is registered.
 - `ThreadManForUser`:
-  - `sceKernelReferThreadEventHandlerStatus` — no thread-event-handler object registry exists.
+  - Thread-event handler callback delivery is not yet wired into thread lifecycle; registration, release, status and ID enumeration metadata are implemented.
   - `sceKernelReferTlsplStatus` — TLS pool objects are not modelled.
 
-`sceKernelGetThreadmanIdList` is now registered and enumerates the object registries currently modelled by PortableKit. Thread-event-handler type 9 returns an empty list until that object type is implemented.
+`sceKernelGetThreadmanIdList` is now registered and enumerates the object registries currently modelled by PortableKit. Thread-event-handler type 9 enumerates the registered handler objects.
 
 ## Recent implementation
 
@@ -49,3 +49,10 @@ The six UtilsForUser functions implemented by a multiline literal-name loop are 
 - Treat all new HLE handlers as source-reviewed, not runtime-verified.
 
 See [GOD_EATER_BURST_HLE_IMPLEMENTATION_UPDATE.md](GOD_EATER_BURST_HLE_IMPLEMENTATION_UPDATE.md) for implementation details.
+
+
+## Latest thread-event handler update
+
+PortableKit now models the thread-event handler object registry and the register, release and status-query APIs. The status structure matches the PSP SDK layout. Actual event dispatch to guest callback functions for thread create/start/exit/delete is still pending.
+
+The remaining static import gaps are 11 `sceJpeg` MJPEG APIs and `sceKernelReferTlsplStatus`. No native build or Android device test has been run.
