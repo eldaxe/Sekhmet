@@ -2,7 +2,7 @@
 
 Target: God Eater Burst PSP US, `ULUS10563`, `APP_VER 01.00`.
 
-PortableKit source: branch `god-eater-burst`, commit `d20be3b37aa1f6519c164a870a95407dee729732`.
+PortableKit source: branch `god-eater-burst`, commit `59b38ba26eb3fe7490838bf0b3d0f89fa8377c01`.
 
 ## Current static import coverage
 
@@ -70,4 +70,9 @@ The remaining documented import gaps are the 11 `sceJpeg` MJPEG APIs. TLS pool c
 - Added a host MJPEG decoder using FFmpeg's `AV_CODEC_ID_MJPEG`, enabled in the bundled FFmpeg decoder configuration.
 - Registered the remaining 11 sceJpeg imports: MJPEG init/create/delete/finish, RGB decode and successive decode, YCbCr decode and successive decode, output-info query, MJPEG CSC and CSC with color option. The existing `sceJpegCsc` now shares the picture conversion path.
 - Decoder output is normalized to planar YCbCr 4:2:0, including 4:2:2/4:4:4 source chroma subsampling and grayscale input. Guest output buffers are range-checked; MJPEG CSC crops luma and chroma planes to the requested dimensions.
-- This closes the static import-registration gap only. Decoder format support, API edge cases, guest buffer layout, output color ordering, and timing remain unverified on PSP game data and Android. Native build/CI must pass before treating this as complete.
+- This closes the static import-registration gap only. Decoder format support, API edge cases, guest buffer layout, output color ordering, timing, and PSP partition-to-host memory mapping remain unverified on PSP game data and Android. Native build/CI must pass before treating this as complete.
+
+
+## TLS partition validation correction (PortableKit 59b38ba)
+
+TLS pool creation now accepts PSP partition IDs 1 through 6 instead of requiring one hard-coded partition ID. PortableKit currently maps the PSP high-memory attribute to its host high/low allocator; it does not yet emulate all six distinct PSP partition allocators. This compatibility limitation is explicit and requires game/runtime validation.
