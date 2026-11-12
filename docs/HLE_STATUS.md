@@ -91,3 +91,8 @@ TLS pools with the PSP priority attribute now order waiting threads by their cur
 MJPEG CSC now enforces the MJPEG initialization state, supports the documented negative buffer-width encoding used by the MJPEG CSC path, and validates the known `sceJpegCsc` chroma subsampling values.
 
 MJPEG HLE lambdas now refer to the function-local static decoder state without attempting to capture a static-storage object. This was corrected proactively before the next Android build.
+
+
+## Thread-event callback regression coverage (PortableKit 9697608)
+
+PortableKit now factors the thread-event callback chain into a small continuation helper used by the production kernel dispatcher. A new host-side test target covers: a handler releasing a later handler before its turn; a handler releasing itself while running; a callback blocking and resuming after a later handler has been released; and nested event dispatch completing without corrupting the outer continuation. These are deterministic host-level continuation tests; an emulator-level test that blocks a guest thread in a real HLE callback and resumes it through the scheduler remains necessary.
